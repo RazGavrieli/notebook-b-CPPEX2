@@ -16,6 +16,7 @@ const int INIT_SIZE = 5;
          * @brief private function that allocates new rows for the page
          * 
          */
+
         for (int i = rows.size(); i<=r; i++) {
             rows.push_back(emptyLine);
         }
@@ -39,33 +40,37 @@ const int INIT_SIZE = 5;
 
             return rows.size();
         }
-        std::string Page::getrow(unsigned int r) {
+        std::string Page::getrow( unsigned int r) {
             /**
              * @brief getter for a specific row in the page (string type, length 100)
              * if the row is bigger than the amount of rows in the page, allocate new rows for it.
              */
+
             if (r>=rows.size()) {
                 allocateRows(r);
                 return rows.at(r);
             }
+
             return rows.at(r);
         }
-        std::string Page::getcol(unsigned int c) {
-            if (c<0 || c>lineSize) {
-                throw std::runtime_error("collums must be an int between 0-100!");
-            }
-            std::string col;
-            for (unsigned int i = 0; i < rows.size(); i++)
-            {
-                col += getrow(i)[c];
-            }
-            return col;
+        //std::string Page::getcol( unsigned int c) {
+        //     if (c<0 || c>lineSize) {
+        //         throw std::runtime_error("collums must be an int between 0-100!");
+        //     }
             
-        }
-        void Page::replaceline(unsigned int r, const std::string &newline) {
+        //     std::string col;
+        //     for ( int i = 0; i < rows.size(); i++)
+        //     {
+        //         col += getrow(i)[c];
+        //     }
+        //     return col;      
+        // }
+
+        void Page::replaceline( unsigned int r, const std::string &newline) {
             if (newline.size()!=lineSize) {
                 throw std::runtime_error("new line size has to be exactly 100!");
             }
+
             if (r>rows.size()) {
                 allocateRows(r);
                 rows[r] = newline;
@@ -82,7 +87,7 @@ namespace ariel {
             const int lineSize = 100;
             const char emptyChar = '_';
             const char erasedChar = '~';
-            void Notebook::allocatePages(unsigned int page) {
+            void Notebook::allocatePages( unsigned int page) {
             /**
              * @brief private function that allocates new pages
              * 
@@ -101,10 +106,12 @@ namespace ariel {
                     }
                 }
         
-                void Notebook::write(unsigned int page, unsigned int row, unsigned int col, Direction dir, std::string text) {
-                    if (page<0||row<0||col<0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
+                void Notebook::write( int spage,  int srow,  int scol, Direction dir, std::string text) {
+                    if (spage<0||srow<0||scol<0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
                         throw std::runtime_error("bad input!");
                     }
+                    unsigned int page = (unsigned int)spage; unsigned int row = (unsigned int)srow; unsigned int col = (unsigned int)scol;
+                    
                     if (page>pages.size()) {
                         allocatePages(page);
                     } 
@@ -115,10 +122,13 @@ namespace ariel {
                         }
                         std::string oldLine = pages.at(page).getrow(row);
                         std::string newLine = emptyLine;
-                        unsigned int j = 0;
-                        for (unsigned int i = 0; i<lineSize; i++) {
+                        size_t j = 0;
+                        for (size_t i = 0; i<lineSize; i++) {
                             if (i>=col&&i<col+text.size()) {
                                 if (oldLine[i]==emptyChar) {
+                                    if (isprint(text[j])==0) {
+                                        throw std::runtime_error("bad character found in text");
+                                    }
                                     newLine[i]=text[j];
                                     j++;
                                 } else {
@@ -130,7 +140,7 @@ namespace ariel {
                         }
                         pages.at(page).replaceline(row, newLine);
                     } else { // Vertical writing
-                        for (unsigned int i = 0; i<text.size(); i++) {
+                        for (   size_t i = 0; i<text.size(); i++) {
                             std::string oldLine = pages.at(page).getrow(row+i);
                             if (oldLine[col]==emptyChar) {
                                 oldLine[col]=text[i];
@@ -143,49 +153,56 @@ namespace ariel {
                     }
                     
                 }
-                std::string Notebook::read(unsigned int page, unsigned int row, unsigned int col, Direction dir, unsigned int len) {
-                    if (page<0||row<0||col<0||len<=0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
+                std::string Notebook::read( int spage,  int srow,  int scol, Direction dir,  int slen) {
+                    if (spage<0||srow<0||scol<0||slen<=0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
                         throw std::runtime_error("bad input!");
                     }
+                    unsigned int page = (unsigned int)spage; unsigned int row = (unsigned int)srow; unsigned col = (unsigned int)scol; unsigned int len = (unsigned int)slen;
                     if (col+len>lineSize) {
                         throw std::runtime_error("out of bounds!");
+                    }
+                    if (page>pages.size()) {
+                        allocatePages(page);
                     }
                     std::string text;
                     std::string line = pages.at(page).getrow(row);
                     if (dir==Direction::Horizontal) {
-                        for (unsigned int i = col; i < col+len; i++)
+                        
+                        for ( size_t i = col; i < col+len; i++)
                         {
                             text += line[i];
                         }  
                     } else { // Vertical reading
-                        for (unsigned int i = 0; i < len; i++)
+                        for ( size_t i = 0; i < len; i++)
                         {
+                            line = pages.at(page).getrow(row+i);
                             text += line[col];
                         }
                         
                     }
                     return text;
                 }
-                void Notebook::erase(unsigned int page, unsigned int row, unsigned int col, Direction dir, unsigned int len) {
-                    if (page<0||row<0||col<0||len<=0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
+                void Notebook::erase( int spage,  int srow,  int scol, Direction dir,  int slen) {
+                    if (spage<0||srow<0||scol<0||slen<=0||(dir!=Direction::Vertical&&dir!=Direction::Horizontal)) {
                         throw std::runtime_error("bad input!");
                     }
+                    unsigned int page = (unsigned int)spage; unsigned int row = (unsigned int)srow; unsigned int col = (unsigned int)scol; unsigned int len = (unsigned int)slen;
                     if (page>pages.size()) {
                         allocatePages(page);
                     } 
                     if (dir==Direction::Horizontal) {
-                        if (lineSize-col<len) {
+                        if (lineSize<len+col) {
                             throw std::runtime_error("out of bounds!");
                         }
                         std::string oldLine = pages.at(page).getrow(row);
-                        for (unsigned int i = col; i < col+len; i++)
+                        for ( size_t i = col; i < col+len; i++)
                         {
                             oldLine[i] = erasedChar;
                         }
                         pages.at(page).replaceline(row, oldLine);  
                         
                     } else { // Vertical writing
-                        for (unsigned int i = 0; i < len; i++)
+                        for ( size_t i = 0; i < len; i++)
                         {
                             std::string oldLine = pages.at(page).getrow(row+i);
                             oldLine[col] = erasedChar;
@@ -194,9 +211,13 @@ namespace ariel {
                         
                     }
                 }
-                void Notebook::show(unsigned int page) {
+                void Notebook::show( int spage) {
+                    if (spage<0) {
+                        throw std::runtime_error("indexs cant be negative");
+                    }
+                    unsigned int page = (unsigned int)spage;
                     std::cout << "page " << page << ":\n";
-                    for (unsigned int i = 0; i<pages.at(page).getsize(); i++) {
+                    for ( size_t i = 0; i<pages.at(page).getsize(); i++) {
                         std::cout << i << ".\t" << pages.at(page).getrow(i) << "\n";
                     }
                 }

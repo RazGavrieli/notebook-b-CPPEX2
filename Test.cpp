@@ -39,6 +39,21 @@ TEST_CASE("Bad input") {
             notebook.erase(1, 3, 80, Direction::Horizontal, 10);
             CHECK_THROWS(notebook.write(1, 3, 93, Direction::Horizontal, "overlap test"));
         }
+        SUBCASE("Unprintable characters") {
+            CHECK_THROWS(notebook.write(3, 3, 73, Direction::Horizontal, "bad \n character"));
+            CHECK_THROWS(notebook.write(2, 3, 73, Direction::Horizontal, "bad \t character"));
+            CHECK_THROWS(notebook.write(7, 3, 73, Direction::Horizontal, "bad \f character"));
+            notebook.show(7);
+            CHECK_THROWS(notebook.write(1, 3, 73, Direction::Horizontal, "bad \b character"));
+        }
+        SUBCASE("Negative indexs") {
+            CHECK_THROWS(notebook.read(1, -1, 1, Direction::Horizontal, 101));
+            CHECK_THROWS(notebook.read(1, 1, -60, Direction::Horizontal, 41));
+            CHECK_THROWS(notebook.read(-1, 1, 20, Direction::Horizontal, 3));
+            CHECK_THROWS(notebook.read(-1, 0, -40, Direction::Horizontal, 0));
+            CHECK_THROWS(notebook.erase(1, 3, 1, Direction::Horizontal, -30));
+            CHECK_THROWS(notebook.erase(1, 3, 80, Direction::Horizontal, 0));
+        }
 }
 
 TEST_CASE("Good input") {
@@ -65,7 +80,7 @@ TEST_CASE("Good input") {
         std::string outputString = notebook2.read(2,1,1,Direction::Vertical, 1);
         CHECK(outputString == t);
         CHECK(notebook2.read(2,2,1,Direction::Vertical, 1) == h);
-        notebook2.erase(2, 1, 1, Direction::Vertical, 2);
+        CHECK_NOTHROW(notebook2.erase(2, 1, 1, Direction::Vertical, 2));
         CHECK(notebook2.read(2,1,1,Direction::Vertical, 1) == tilde);
         CHECK(notebook2.read(2,2,1,Direction::Vertical, 1) == tilde);
         CHECK(notebook2.read(2,3,1,Direction::Vertical, 1) == i);
