@@ -117,7 +117,7 @@ namespace ariel {
             }
             unsigned int page = (unsigned int)spage; unsigned int row = (unsigned int)srow; unsigned int col = (unsigned int)scol;
             
-            if (page>pages.size()) {
+            if (page>=pages.size()) {
                 allocatePages(page);
             } 
 
@@ -131,7 +131,7 @@ namespace ariel {
                 for (size_t i = 0; i<lineSize; i++) {
                     if (i>=col&&i<col+text.size()) {
                         if (oldLine[i]==emptyChar) {
-                            if (isprint(text[j])==0) {
+                            if (isprint(text[j])==0||text[j]=='~') {
                                 throw std::runtime_error("bad character found in text");
                             }
                             newLine[i]=text[j];
@@ -148,6 +148,9 @@ namespace ariel {
                 for (   size_t i = 0; i<text.size(); i++) {
                     std::string oldLine = pages.at(page).getrow(row+i);
                     if (oldLine[col]==emptyChar) {
+                        if (isprint(text[i])==0||text[i]=='~') {
+                            throw std::runtime_error("bad character found in text");
+                        }
                         oldLine[col]=text[i];
                     } else {
                         throw std::runtime_error("text is overlapping!");
@@ -167,21 +170,24 @@ namespace ariel {
                 throw std::runtime_error("bad input!");
             }
             unsigned int page = (unsigned int)spage; unsigned int row = (unsigned int)srow; unsigned col = (unsigned int)scol; unsigned int len = (unsigned int)slen;
-            if (col+len>lineSize) {
-                throw std::runtime_error("out of bounds!");
-            }
+
             if (page>pages.size()) {
                 allocatePages(page);
             }
             std::string text;
             std::string line = pages.at(page).getrow(row);
             if (dir==Direction::Horizontal) {
-                
+                if (col+len>lineSize) {
+                     throw std::runtime_error("out of bounds!");
+                }
                 for ( size_t i = col; i < col+len; i++)
                 {
                     text += line[i];
                 }  
             } else { // Vertical reading
+                if (col>=lineSize) {
+                    throw std::runtime_error("out of bounds!");
+                }
                 for ( size_t i = 0; i < len; i++)
                 {
                     line = pages.at(page).getrow(row+i);
@@ -215,6 +221,9 @@ namespace ariel {
                 pages.at(page).replaceline(row, oldLine);  
                 
             } else { // Vertical writing
+                 if (col>=lineSize) {
+                    throw std::runtime_error("out of bounds!");
+                }
                 for ( size_t i = 0; i < len; i++)
                 {
                     std::string oldLine = pages.at(page).getrow(row+i);
