@@ -144,7 +144,7 @@ namespace ariel {
                 }
                 pages.at(page).replaceline(row, newLine);
             } else { // Vertical writing
-            if (col>=100) {
+            if (col>=lineSize) {
                 throw std::runtime_error("text out of bounds!");
             }
                 for (   size_t i = 0; i<text.size(); i++) {
