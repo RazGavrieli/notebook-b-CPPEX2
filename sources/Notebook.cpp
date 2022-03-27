@@ -20,14 +20,13 @@ const char erasedChar = '~';
             rows.push_back(emptyLine);
         }
     }
-    
         Page::Page() {
             /**
             * @brief 
             * vector of strings has already been declared in the fields of the class. (objects initialization)
             * In this constructor we will declare defined amount of rows. Each row is a string with 100 empty characters.
             */ 
-
+            const std::string emptyLine = "____________________________________________________________________________________________________";  
             for (int i = 0; i<INIT_SIZE; i++) {
                 rows.push_back(emptyLine);
             }
@@ -145,6 +144,9 @@ namespace ariel {
                 }
                 pages.at(page).replaceline(row, newLine);
             } else { // Vertical writing
+            if (col>=100) {
+                throw std::runtime_error("text out of bounds!");
+            }
                 for (   size_t i = 0; i<text.size(); i++) {
                     std::string oldLine = pages.at(page).getrow(row+i);
                     if (oldLine[col]==emptyChar) {
