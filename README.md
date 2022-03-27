@@ -1,4 +1,9 @@
+GRADE 100 PROOF:
+<br>
+https://user-images.githubusercontent.com/90526270/160286749-8f7dbc73-5338-4def-a805-c94e607aa70c.png <br>
+
 <div dir="rtl" lang="he">
+
 
 # מחברת ועט
 
