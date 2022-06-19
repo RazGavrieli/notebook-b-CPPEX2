@@ -106,7 +106,7 @@ namespace ariel {
             }
         }
 
-        void Notebook::write( int spage,  int srow,  int scol, Direction dir, std::string text) {
+        void Notebook::write( int spage,  int srow,  int scol, Direction dir, const std::string& text) {
             /**
              * @brief writes text into the asked indexs
              * 
